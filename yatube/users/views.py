@@ -1,9 +1,10 @@
 # Импортируем CreateView, чтобы создать ему наследника
-from django.views.generic import CreateView
 # from django.contrib.auth.views import PasswordChangeView
 # Функция reverse_lazy позволяет
 # получить URL по параметрам функции path()
 from django.urls import reverse_lazy
+from django.views.generic import CreateView
+
 # Импортируем класс формы, чтобы сослаться на неё во view-классе
 from .forms import CreationForm, PasswordChangeForm
 

@@ -1,7 +1,8 @@
+from django import forms
 from django.contrib.auth import get_user_model
+from django.core.cache import cache
 from django.test import Client, TestCase
 from django.urls import reverse
-from django import forms
 
 from ..models import Group, Post
 
@@ -22,6 +23,7 @@ class FormModelTest(TestCase):
         )
 
     def setUp(self) -> None:
+        self.guest_client = Client()
         self.authorized_client = Client()
         self.authorized_client.force_login(self.user)
 
@@ -58,9 +60,11 @@ class FormModelTest(TestCase):
                 post_author_0 = str(first_object.author)
                 post_text_0 = str(first_object.text)
                 post_group_0 = str(first_object.group)
+                post_image_0 = str(first_object.image)
                 self.assertEqual(post_author_0, f'{FormModelTest.post.author}')
                 self.assertEqual(post_text_0, f'{FormModelTest.post.text}')
                 self.assertEqual(post_group_0, f'{FormModelTest.post.group}')
+                self.assertEqual(post_image_0, f'{FormModelTest.post.image}')
 
     def test_view(self):
         pages_names_filters = {
@@ -79,8 +83,9 @@ class FormModelTest(TestCase):
         reverse_name = reverse('posts:post_create')
         response = self.authorized_client.get(reverse_name)
         form_fields = {
-             'text': forms.fields.CharField,
-             'group': forms.fields.ChoiceField
+            'text': forms.fields.CharField,
+            'group': forms.fields.ChoiceField,
+            'image': forms.fields.ImageField,
         }
         for value, expected in form_fields.items():
             with self.subTest(value=value):
@@ -92,7 +97,8 @@ class FormModelTest(TestCase):
         response = self.authorized_client.get(reverse_name)
         form_fields = {
             'text': forms.fields.CharField,
-            'group': forms.fields.ChoiceField
+            'group': forms.fields.ChoiceField,
+            'image': forms.fields.ImageField
         }
         for value, expected in form_fields.items():
             with self.subTest(value=value):
@@ -157,3 +163,29 @@ class PaginatorViewTest(TestCase):
             with self.subTest(reverse_name=reverse_name):
                 response = self.authorized_client.get(reverse_name + '?page=2')
                 self.assertEqual(len(response.context['page_obj']), post_amount)
+
+
+class CacheTest(TestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.user = User.objects.create_user(username='user')
+        cls.group = Group.objects.create(slug='test_slug')
+        cls.post = Post.objects.create(
+            author=cls.user,
+            group=cls.group
+        )
+
+    def setUp(self) -> None:
+        self.guest_client = Client()
+        cache.clear()
+
+    def test_cache(self):
+        """Тестирование кеширования главной страницы."""
+        response = self.guest_client.get(reverse('posts:index'))
+        self.post.delete()
+        response_2 = self.guest_client.get(reverse('posts:index'))
+        self.assertEqual(response.content, response_2.content)
+        cache.clear()
+        response_3 = self.guest_client.get(reverse('posts:index'))
+        self.assertNotEqual(response.content, response_3.content)

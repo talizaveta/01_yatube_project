@@ -1,4 +1,5 @@
 from http import HTTPStatus
+
 from django.contrib.auth import get_user_model
 from django.test import Client, TestCase
 
@@ -53,7 +54,7 @@ class StaticURLTests(TestCase):
             ('/profile/auth/', '/posts/1111/delete/', self.authorized_client),
         }
         for redirect, path, client in urls:
-            with self.subTest(path=path):
+            with self.subTest(redirect=redirect):
                 response = client.get(path, follow=True)
                 self.assertRedirects(response, redirect)
 

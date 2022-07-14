@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load thumbnail %}
 {% block title%}
   Записи сообщества {{ group }}
 {% endblock %}
@@ -7,15 +8,11 @@
   <p>{{ group.description }}</p>
   <article>
     {% for post in page_obj %}
-      <ul>
-        <li>
-          Автор: {{ post.author.get_full_name }}
-        </li>
-        <li>
-          Дата публикации: {{ post.pub_date|date:"d E Y" }}
-        </li>
-      </ul>
+      {% include 'includes/post_info.html' %}
       <p>{{ post.text }}</p>
+    <a href="{% url 'posts:post_detail' post.id %}">
+          подробнее
+        </a><br>
     {% if not forloop.last %}<hr>{% endif %}
     {% endfor %}
   </article>

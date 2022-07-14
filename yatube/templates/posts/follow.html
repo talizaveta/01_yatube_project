@@ -1,9 +1,9 @@
 {% extends 'base.html' %}
 {% load cache %}
-{% block title %}Главная страница{% endblock %}
+{% block title %}Подписки{% endblock %}
 {% block content %}
 {% cache 20 index_page page_obj %}
-  <h1>Последние обновления на сайте</h1>
+  <h1>Посты пользователей, на которых вы подписаны</h1>
   <article>
     {% include 'includes/switcher.html' %}
     {% for post in page_obj %}
