@@ -1,9 +1,14 @@
 {% extends "base.html" %}
 {% block title %}Об авторе проекта{% endblock %}
 {% block content %}
-<h1>Привет, я автор</h1>
-<p>
-  Тут я размещу информацию о себе, используя свои умения верстать.
-  Картинки, блоки, элементы бустрап. А может быть, просто напишу несколько абзацев текста.
-</p>
+    <div class="container py-5 row">
+      <aside class="col-12 col-md-3">
+        <img style="margin-bottom: 40px" src="/static/img/me.jpg" width=100% alt="">
+      </aside>
+      <article style="padding-left: 70px" class="col-12 col-md-9">
+        <h1>Привет, я автор этого проекта</h1><br>
+        <p>Меня зовут Лиза и я учусь в Яндекс Практикуме на курсе Python-разработчик.</p>
+        <p>С радостью представляю Вам свой проект ☺</p>
+      </article>
+    </div>
 {% endblock %}

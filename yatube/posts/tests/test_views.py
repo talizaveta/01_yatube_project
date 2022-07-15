@@ -4,7 +4,7 @@ from django.core.cache import cache
 from django.test import Client, TestCase
 from django.urls import reverse
 
-from ..models import Group, Post
+from ..models import Follow, Group, Post
 
 User = get_user_model()
 
@@ -189,3 +189,64 @@ class CacheTest(TestCase):
         cache.clear()
         response_3 = self.guest_client.get(reverse('posts:index'))
         self.assertNotEqual(response.content, response_3.content)
+
+
+# Авторизованный пользователь может
+# подписываться на других пользователей
+# и удалять их из подписок
+class FollowTest(TestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.user_1 = User.objects.create_user(username='user_1')
+        cls.user_2 = User.objects.create_user(username='auth')
+
+    def setUp(self) -> None:
+        self.authorized_client_1 = Client()
+        self.authorized_client_1.force_login(self.user_1)
+        self.reverse_follow = reverse(
+            'posts:profile_follow',
+            kwargs={'username': self.user_2}
+        )
+        self.reverse_unfollow = reverse(
+            'posts:profile_unfollow',
+            kwargs={'username': self.user_2}
+        )
+        self.reverse_redirect = reverse(
+            'posts:profile',
+            kwargs={'username': self.user_2}
+        )
+        self.reverse_follow_index = reverse(
+            'posts:follow_index'
+        )
+
+    def test_following(self):
+        """Авторизованный пользователь может
+        подписываться на других пользователей
+        и удалять их из подписок
+        """
+        Follow.objects.create(user=self.user_1, author=self.user_2)
+        follow_count = Follow.objects.count()
+        response = self.authorized_client_1.get(self.reverse_follow)
+        self.assertEqual(follow_count, 1)
+        response = self.authorized_client_1.get(self.reverse_unfollow)
+        follow_count = Follow.objects.count()
+        self.assertEqual(follow_count, 0)
+        self.assertRedirects(response, self.reverse_redirect)
+
+    def test_post_follow(self):
+        """Новая запись пользователя появляется
+        в ленте тех, кто на него подписан
+        """
+        post = Post.objects.create(author=self.user_2)
+        Follow.objects.create(user=self.user_1, author=self.user_2)
+        response = self.authorized_client_1.get(reverse('posts:follow_index'))
+        self.assertIn(post, response.context['page_obj'])
+
+    def test_post_not_follow(self):
+        """Новая запись пользователя не появляется
+        в ленте тех, кто на него не подписан
+        """
+        post = Post.objects.create(author=self.user_2)
+        response = self.authorized_client_1.get(self.reverse_follow_index)
+        self.assertNotIn(post, response.context['page_obj'])

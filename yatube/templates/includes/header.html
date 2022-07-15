@@ -8,17 +8,10 @@
         <span style="color:red">Ya</span>tube
       </a>
       <ul class="nav nav-pills">
-        <li class="nav-item">
-          <a class="nav-link {% if view_name  == 'about:author' %}active{% endif %}"
-            href="{% url 'about:author' %}">Об авторе</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link {% if view_name  == 'about:tech' %}active{% endif %}"
-            href="{% url 'about:tech' %}">Технологии</a>
-        </li>
         {% if user.is_authenticated %}
         <li class="nav-item">
-          <a class="nav-link" href="{% url 'posts:post_create' %}">Новая запись</a>
+          <a class="nav-link link-light {% if view_name  == 'posts:post_create' %}active{% endif %}"
+            href="{% url 'posts:post_create' %}">Новая запись</a>
         </li>
         <li class="nav-item">
           <a class="nav-link link-light {% if view_name  == 'users:password_change' %}active{% endif %}"
@@ -28,7 +21,7 @@
           <a class="nav-link link-light" href="{% url 'users:logout' %}">Выйти</a>
         </li>
         <li>
-          <a href="{% url 'posts:profile' request.user %}">
+          <a class="text-decoration-none" href="{% url 'posts:profile' request.user %}">
             Пользователь:<br>{{ user.username }}
           </a>
         </li>

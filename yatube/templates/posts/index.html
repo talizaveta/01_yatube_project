@@ -2,16 +2,13 @@
 {% load cache %}
 {% block title %}Главная страница{% endblock %}
 {% block content %}
-{% cache 20 index_page page_obj %}
   <h1>Последние обновления на сайте</h1>
   <article>
-    {% include 'includes/switcher.html' %}
+    {% include 'includes/switcher.html' with index=True %}
+    {% cache 20 index_page page_obj %}
     {% for post in page_obj %}
       {% include 'includes/post_info.html' %}
-        <p>{{ post.text }}</p>
-        <a href="{% url 'posts:post_detail' post.id %}">
-          подробнее
-        </a><br>
+        <p >{{ post.text }}</p>
         {% include 'includes/group_info.html' %}
     {% endfor %}
   {% endcache %}

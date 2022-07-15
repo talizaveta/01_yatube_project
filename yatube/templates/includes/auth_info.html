@@ -1,0 +1,34 @@
+  <div class="container py-4">
+    <div class="card my-2">
+		  <h5 class="card-header">Все записи автора {{ author.get_full_name }}</h5>
+			<div class="card-body">
+
+					<div class="row">
+						<article class="col-md-8">
+							<h6>Всего записей: {{ author.posts.count }}</h6>
+							<h6>Подписчиков: {{ author.following.count }}</h6>
+							<br>
+							<div>
+                                {% if user != author %}
+                                {% if following %}
+                                <a
+                                  class="btn btn-lg btn-light"
+                                  href="{% url 'posts:profile_unfollow' author.username %}" role="button"
+                                >
+                                  Отписаться
+                                </a>
+                              {% else %}
+                                  <a
+                                    class="btn btn-outline-primary"
+                                    href="{% url 'posts:profile_follow' author.username %}" role="button"
+                                  >
+                                    Подписаться
+                                  </a><br>
+                                        {% endif %}
+                               {% endif %}
+							</div>
+						</article>
+					</div>
+
+			</div>
+    </div>

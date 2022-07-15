@@ -1,12 +1,23 @@
 {% load thumbnail %}
-<ul>
+<ul style="list-style: none;">
   <li>
-    Автор: {{ post.author.get_full_name }}
+    Автор: <a class="text-decoration-none" href="{% url 'posts:profile' post.author %}">
+          {{ post.author.get_full_name }}
+        </a><br>
   </li>
-  <li>
+  {% if post.group %}
+    <li>
+      Все записи группы:
+      <a class="text-decoration-none" href="{% url 'posts:group_list' post.group.slug %}"> {{ post.group.title }}</a>
+    </li>
+    {% else %}
+      <p class="text-secondary">Этой публикации нет ни в одном сообществе</p>
+  {% endif %}
+  <p class="text-secondary">
     Дата публикации: {{ post.pub_date|date:"d E Y" }}
-  </li>
+  </p>
 </ul>
-{% thumbnail post.image "960x339" crop="center" upscale=True as im %}
+  {% thumbnail post.image "960x339" crop="center" upscale=True as im %}
   <img class="card-img my-2" src="{{ im.url }}">
+
 {% endthumbnail %}
